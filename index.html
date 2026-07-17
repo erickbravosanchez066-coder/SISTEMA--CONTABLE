@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Libro Mayor · Sistema Contable</title>
+<title>Sistema Contable</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -331,7 +331,7 @@
       <div class="sub">Registro contable de operaciones</div>
       <div class="title-row">
         <span class="crest">§</span>
-        <h1>Libro Mayor &amp; Diario</h1>
+        <h1>BIENVENIDO</h1>
       </div>
     </div>
     <div style="text-align:right;">
@@ -470,7 +470,7 @@
   </div>
 
   <!-- DIARIO -->
-  <div class="panel active" id="panel-diario">
+  <div class="panel" id="panel-diario">
     <div class="card">
       <h2>Asiento manual</h2>
       <p class="desc">Úsalo para los saldos iniciales del periodo (apertura de libros) o para cualquier ajuste manual — por ejemplo, un asiento adicional de costo de ventas. Agrega tantas líneas como cuentas necesites; el asiento debe cuadrar (Debe = Haber) antes de poder registrarse.</p>
@@ -1237,9 +1237,8 @@ function bloqueAsiento(a, vinculoId){
     });
   }
 
-  const idForm = vinculoId ? 'form-'+vinculoId.replace(/[^a-zA-Z0-9]/g,'-') : '';
   const formHtml = vinculoId ? `
-    <div id="${idForm}" class="mini-form-manual" style="display:none;">
+    <div class="mini-form-manual" style="display:none;">
       <div class="mini-form-row">
         <input type="text" placeholder="Código cuenta" class="mf-cuenta1">
         <input type="text" placeholder="Denominación (opcional)" class="mf-nombre1">
@@ -1251,10 +1250,10 @@ function bloqueAsiento(a, vinculoId){
         <input type="number" step="0.01" placeholder="Haber" class="mf-haber2">
       </div>
       <div class="mini-form-actions">
-        <button class="btn" style="padding:6px 12px;font-size:0.78rem;" onclick="guardarCuentaManualVinculada('${vinculoId}','${a.fecha}')">Guardar cuenta</button>
-        <button class="btn ghost" style="padding:6px 12px;font-size:0.78rem;" onclick="toggleFormManual('${vinculoId}')">Cancelar</button>
+        <button class="btn" style="padding:6px 12px;font-size:0.78rem;" onclick="guardarCuentaManualVinculada(this,'${vinculoId}','${a.fecha}')">Guardar cuenta</button>
+        <button class="btn ghost" style="padding:6px 12px;font-size:0.78rem;" onclick="this.closest('.mini-form-manual').style.display='none'">Cancelar</button>
       </div>
-      <div class="mini-form-error" id="err-${idForm}"></div>
+      <div class="mini-form-error"></div>
     </div>` : '';
 
   return `<div class="asiento-block">
@@ -1265,20 +1264,18 @@ function bloqueAsiento(a, vinculoId){
         <td class="num debe" style="font-weight:700;">${fmt(tD)}</td>
         <td class="num haber" style="font-weight:700;">${fmt(tH)}</td><td></td></tr>
     </tbody></table>
-    ${vinculoId? `<button class="btn ghost" style="margin-top:10px;font-size:0.75rem;padding:5px 10px;" onclick="toggleFormManual('${vinculoId}')">+ Agregar cuenta manual a este asiento</button>`:''}
+    ${vinculoId? `<button class="btn ghost" style="margin-top:10px;font-size:0.75rem;padding:5px 10px;" onclick="toggleFormManual(this)">+ Agregar cuenta manual a este asiento</button>`:''}
     ${formHtml}
   </div>`;
 }
-function toggleFormManual(vinculoId){
-  const id = 'form-'+vinculoId.replace(/[^a-zA-Z0-9]/g,'-');
-  const el = document.getElementById(id);
+function toggleFormManual(btn){
+  const el = btn.nextElementSibling;
   if(!el) return;
   el.style.display = el.style.display==='none' ? 'block' : 'none';
 }
-async function guardarCuentaManualVinculada(vinculoId, fecha){
-  const id = 'form-'+vinculoId.replace(/[^a-zA-Z0-9]/g,'-');
-  const form = document.getElementById(id);
-  const errBox = document.getElementById('err-'+id);
+async function guardarCuentaManualVinculada(btnGuardar, vinculoId, fecha){
+  const form = btnGuardar.closest('.mini-form-manual');
+  const errBox = form.querySelector('.mini-form-error');
   errBox.textContent = '';
   const c1 = form.querySelector('.mf-cuenta1').value.trim();
   const n1 = form.querySelector('.mf-nombre1').value.trim();
